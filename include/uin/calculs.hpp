@@ -1,7 +1,7 @@
 #pragma once
 
 #include "uin/regles.hpp"
-#include <vector>
+#include <span>
 
 namespace uin {
 
@@ -12,12 +12,12 @@ struct Statistiques {
     double ecartType{};
 };
 
-[[nodiscard]] double somme(const std::vector<double>& valeurs);
-[[nodiscard]] double moyenne(const std::vector<double>& notes);
-[[nodiscard]] double moyenne(const std::vector<double>& notes,
-                             const std::vector<double>& coefficients);
-[[nodiscard]] Statistiques calculerStatistiques(const std::vector<double>& notes);
-[[nodiscard]] int compterValides(const std::vector<double>& notes,
+[[nodiscard]] double somme(std::span<const double> valeurs);
+[[nodiscard]] double moyenne(std::span<const double> notes);
+[[nodiscard]] double moyenne(std::span<const double> notes,
+                             std::span<const double> coefficients);
+[[nodiscard]] Statistiques calculerStatistiques(std::span<const double> notes);
+[[nodiscard]] int compterValides(std::span<const double> notes,
                                  double seuil = seuilValidation);
 [[nodiscard]] double arrondir(double valeur, int decimales = 2);
 
