@@ -5,7 +5,8 @@
 
 namespace uin {
 
-double lireNote(std::string_view invite);
+std::string lireTexte(std::string_view invite);
 int lireEntier(std::string_view invite, int min, int max);
+double lireNote(std::string_view invite);
 
 } // namespace uin
