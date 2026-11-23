@@ -12,7 +12,6 @@ option(UIN_ACTIVER_SANITIZERS "Activer AddressSanitizer et UBSan" OFF)
 # Options communes à toutes les cibles
 add_library(uincampus_options INTERFACE)
 target_compile_features(uincampus_options INTERFACE cxx_std_23)
-
 if(MSVC)
     target_compile_options(uincampus_options INTERFACE /W4 /permissive-)
 else()
