@@ -7,32 +7,40 @@
 
 namespace uin {
 
-Etudiant::Etudiant(std::string matricule, std::string nom, std::string prenom)
-    : matricule_(std::move(matricule)), nom_(std::move(nom)), prenom_(std::move(prenom))
+Etudiant::Etudiant(Identite identite) : identite_(std::move(identite))
 {
-    if (matricule_.empty()) {
+    if (identite_.matricule.empty()) {
         throw std::invalid_argument("Etudiant : le matricule est obligatoire");
     }
-    if (nom_.empty() || prenom_.empty()) {
-        throw std::invalid_argument(
-            std::format("Etudiant {} : le nom et le prénom sont obligatoires", matricule_));
+    if (identite_.nom.empty() || identite_.prenom.empty()) {
+        throw std::invalid_argument(std::format(
+            "Etudiant {} : le nom et le prénom sont obligatoires", identite_.matricule));
+    }
+}
+
+// Constructeur à liste
+Etudiant::Etudiant(Identite identite, std::initializer_list<ResultatUE> resultats)
+    : Etudiant(std::move(identite)) // Délégation pour vérifier l'identité
+{
+    for (const auto& [ue, note] : resultats) {
+        enregistrerResultat(ue, note); // Préserve l'invariant
     }
 }
 
 std::string Etudiant::nomComplet() const
 {
-    return std::format("{} {}", prenom_, nom_);
+    return std::format("{} {}", identite_.prenom, identite_.nom);
 }
 
 void Etudiant::enregistrerResultat(const UE& ue, Note note)
 {
     for (ResultatUE& resultat : resultats_) {
         if (resultat.ue.code() == ue.code()) {
-            resultat.note = note; // Remplace la note existante
+            resultat.note = note;
             return;
         }
     }
-    resultats_.push_back({ue, note});
+    resultats_.push_back(ResultatUE{.ue = ue, .note = note});
 }
 
 double Etudiant::moyenne() const

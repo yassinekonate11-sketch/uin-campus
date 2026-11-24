@@ -6,13 +6,13 @@
 
 namespace uin {
 
+// Constructeur principal
 UE::UE(std::string code, std::string intitule, int credits, double coefficient)
     : code_(std::move(code)),
       intitule_(std::move(intitule)),
       credits_(credits),
       coefficient_(coefficient)
 {
-    // On vérifie les ATTRIBUTS : les paramètres code et intitule ont été déplacés.
     if (code_.empty()) {
         throw std::invalid_argument("UE : le code est obligatoire");
     }
@@ -27,6 +27,13 @@ UE::UE(std::string code, std::string intitule, int credits, double coefficient)
         throw std::invalid_argument(
             std::format("UE {} : coefficient invalide ({})", code_, coefficient_));
     }
+}
+
+// Constructeur délégué
+UE::UE(std::string code, std::string intitule, int credits)
+    : UE(std::move(code), std::move(intitule), credits, static_cast<double>(credits))
+{
+    // Toutes les vérifications sont faites par le constructeur principal !
 }
 
 } // namespace uin

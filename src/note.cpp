@@ -13,4 +13,13 @@ Note::Note(double valeur) : valeur_(valeur)
     }
 }
 
+Note Note::depuisBarème(double valeur, double barème)
+{
+    if (!(barème > 0.0)) {
+        throw std::invalid_argument(std::format("Barème invalide : {}", barème));
+    }
+    // Le constructeur vérifie le résultat
+    return Note(valeur * noteMax / barème);
+}
+
 } // namespace uin

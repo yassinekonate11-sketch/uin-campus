@@ -1,38 +1,64 @@
 #include "uin/etudiant.hpp"
 #include "uin/regles.hpp"
+#include "uin/saisie.hpp"
+#include "uin/version.hpp"
 
+#include <cstdlib>
 #include <exception>
+#include <format>
 #include <print>
+#include <string>
+#include <utility>
+
+namespace {
+
+[[nodiscard]] uin::UE saisirUE(int numero)
+{
+    std::println("\nUE {}", numero);
+    std::string code = uin::lireTexte(" Code : ");
+    std::string intitule = uin::lireTexte(" Intitulé : ");
+    const int credits = uin::lireEntier(" Credits (1 à 30) : ", 1, 30);
+    const int coefficient = uin::lireEntier(" Coefficient (1 à 10, 0 = égal aux crédits) : ", 0, 10);
+
+    if (coefficient == 0) {
+        return uin::UE(std::move(code), std::move(intitule), credits); // Constructeur délégué
+    }
+    return uin::UE(std::move(code), std::move(intitule), credits, static_cast<double>(coefficient));
+}
+
+} // namespace
 
 int main()
 {
     try {
-        // 1. Création de l'étudiant
-        uin::Etudiant etudiant{"UIN-2026-001", "Konaté", "Yassine"};
-        
-        // 2. Création des UE
-        uin::UE ue1{"INF101", "Programmation C++", 6, 3.0};
-        uin::UE ue2{"MAT101", "Mathématiques", 4, 2.0};
-        
-        // 3. Enregistrement des notes
-        etudiant.enregistrerResultat(ue1, uin::Note{15.5});
-        etudiant.enregistrerResultat(ue2, uin::Note{12.0});
-        
-        // 4. Affichage des résultats
+        std::println("UIN-Campus {} - Relevé d'un étudiant\n", uin::version());
+
+        // On crée d'abord l'Identite (qui est une struct, donc les initialiseurs désignés marchent)
+        // puis on la passe au constructeur de Etudiant.
+        uin::Etudiant etudiant{
+            uin::Identite{
+                .matricule = uin::lireTexte("Matricule : "),
+                .nom = uin::lireTexte("Nom : "),
+                .prenom = uin::lireTexte("Prénom : ")
+            }
+        };
+
+        const int nbUE = uin::lireEntier("Nombre d'UE (1 à 30) : ", 1, 30);
+        for (int i{1}; i <= nbUE; ++i) {
+            const uin::UE ue = saisirUE(i);
+            etudiant.enregistrerResultat(ue, uin::Note{uin::lireNote(" Note : ")});
+        }
+
+        std::println("\n{:-<44}", "");
         std::println("Étudiant : {}", etudiant.nomComplet());
         std::println("Moyenne  : {:.2f}", etudiant.moyenne());
         std::println("Crédits  : {}/{}", etudiant.creditsObtenus(), etudiant.creditsInscrits());
         std::println("Mention  : {}", uin::libelle(etudiant.mention()));
-        
-        std::println("\n--- Test des invariants ---");
-        
-        // 5. Test de sécurité : on essaie de créer une note de 25 (ce qui est interdit)
-        // Le programme devrait attraper l'erreur et l'afficher proprement au lieu de planter.
-        uin::Note noteInvalide{25.0};
-        
+        std::println("{:-<44}", "");
+
     } catch (const std::exception& e) {
-        std::println(stderr, "\nErreur interceptée : {}", e.what());
+        std::println(stderr, "Erreur : {}", e.what());
+        return EXIT_FAILURE;
     }
-    
-    return 0;
+    return EXIT_SUCCESS;
 }
